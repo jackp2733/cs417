@@ -31,6 +31,7 @@ class HashTableOpen:
     # ── TODO 1: Hash Function ─────────────────────────────────────
 
     def _hash(self, key):
+        return hash(key) % self.size
         """
         Return a slot index for the given key.
 
@@ -48,6 +49,36 @@ class HashTableOpen:
     # ── TODO 2: Put ───────────────────────────────────────────────
 
     def put(self, key, value):
+        start = self._hash(key)
+        first_tombstone_index = None
+
+        for step in range(self.size):
+            idx = (start + step) % self.size
+            slot = self.table[idx]
+
+            if slot is _TOMBSTONE and first_tombstone_index is None:
+                first_tombstone_index = idx
+                continue
+
+            if slot is None:
+                if first_tombstone_index is not None:
+                    self.table[first_tombstone_index] = (key, value)
+                else:
+                    self.table[idx] = (key, value)
+                self.count += 1
+                return
+
+            k, _ = slot
+            if k == key:
+                self.table[idx] = (key, value)
+                return
+
+        if first_tombstone_index is not None:
+            self.table[first_tombstone_index] = (key, value)
+            self.count += 1
+            return
+
+        raise Exception("Hash table is full")
         """
         Insert or update a key-value pair using linear probing.
 
@@ -72,6 +103,23 @@ class HashTableOpen:
     # ── TODO 3: Get ───────────────────────────────────────────────
 
     def get(self, key):
+        start = self._hash(key)
+
+        for step in range(self.size):
+            idx = (start + step) % self.size
+            slot = self.table[idx]
+
+            if slot is None:
+                raise KeyError(key)
+
+            if slot is _TOMBSTONE:
+                continue
+
+            k, v = slot
+            if k == key:
+                return v
+
+        raise KeyError(key)
         """
         Look up a value by key, following the probe chain.
 
@@ -100,6 +148,25 @@ class HashTableOpen:
     # ── TODO 4: Delete ────────────────────────────────────────────
 
     def delete(self, key):
+        start = self._hash(key)
+
+        for step in range(self.size):
+            idx = (start + step) % self.size
+            slot = self.table[idx]
+
+            if slot is None:
+                raise KeyError(key)
+
+            if slot is _TOMBSTONE:
+                continue
+
+            k, _ = slot
+            if k == key:
+                self.table[idx] = _TOMBSTONE
+                self.count -= 1
+                return
+
+        raise KeyError(key)
         """
         Remove a key-value pair by replacing it with a tombstone.
 
