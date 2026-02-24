@@ -16,34 +16,51 @@ class TestTombstones:
     """Tests that tombstones keep the hash table working correctly."""
 
     def test_probe_chain_survives_deletion(self):
-        """
-        Insert three keys that collide (use a small table, like size=3).
-        Delete the MIDDLE one.
-        Verify that you can still find the LAST one.
+        ht = HashTableOpen(size=3)
 
-        This is the core tombstone test — if delete uses None instead
-        of a tombstone, this test will fail because the probe chain breaks.
-        """
+    # Force collisions: 0, 3, 6 all map to 0 % 3 == 0
+        ht.put(0, "a")
+        ht.put(3, "b")
+        ht.put(6, "c")
+
+        ht.delete(3)  # delete middle of probe chain
+
+        assert ht.get(6) == "c"   
+        assert 6 in ht               
+       
         pass  # TODO: write this test
 
     def test_tombstone_slot_reused_on_insert(self):
-        """
-        Insert a key, then delete it (creating a tombstone).
-        Insert a NEW key that would land on that same slot.
-        Verify the new key is stored and the count is correct.
+        ht = HashTableOpen(size=3)
 
-        This tests that put() treats tombstones as open slots
-        for new insertions.
-        """
+        ht.put("x", 1)
+        ht.put("y", 2)
+        assert len(ht) == 2
+
+        ht.delete("x")
+        assert len(ht) == 1
+
+        ht.put("z", 3)
+
+        assert len(ht) == 2
+        assert ht.get("z") == 3
+       
         pass  # TODO: write this test
 
     def test_count_correct_through_delete_and_reinsert(self):
-        """
-        Start with a table, insert 3 keys (count should be 3).
-        Delete one (count should be 2).
-        Reinsert a key with the same name (count should be 3).
-        Delete two keys (count should be 1).
+        ht = HashTableOpen(size=5)
 
-        Verify len() is correct after every step.
-        """
+        ht.put("a", 1)
+        ht.put("b", 2)
+        ht.put("c", 3)
+        assert len(ht) == 3
+
+        ht.delete("b")
+        assert len(ht) == 2
+        assert "b" not in ht
+
+        ht.put("b", 999)
+        assert len(ht) == 3
+        assert ht.get("b") == 999
+       
         pass  # TODO: write this test
