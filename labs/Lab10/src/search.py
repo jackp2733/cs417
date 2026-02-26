@@ -17,16 +17,11 @@ Run tests:
 
 
 def sequential_search(a_list, target):
-    """
-    Search for target in a_list by checking each item from the start.
-
-    Args:
-        a_list: A list of items (not necessarily sorted).
-        target: The item to search for.
-
-    Returns:
-        True if target is found, False otherwise.
-    """
+    for item in a_list:
+        if item == target:
+            return True
+    return False
+   
     pass  # TODO: implement this
 
 
@@ -34,28 +29,23 @@ def sequential_search(a_list, target):
 
 
 def binary_search(a_list, target):
-    """
-    Search for target in a sorted list by repeatedly halving
-    the search space.
+    first = 0
+    last = len(a_list) - 1
 
-    The list MUST be sorted in ascending order for this to work.
+    while first <= last:
+        mid = (first + last) // 2
+        mid_value = a_list[mid]
 
-    Algorithm:
-        1. Set first = 0, last = len(a_list) - 1
-        2. While first <= last:
-           - Compute mid = (first + last) // 2
-           - If a_list[mid] == target → return True
-           - If target < a_list[mid] → search the left half (last = mid - 1)
-           - If target > a_list[mid] → search the right half (first = mid + 1)
-        3. If the loop ends → return False
+        if mid_value == target:
+            return True
+        elif target < mid_value:
+            # target is in the left half
+            last = mid - 1
+        else:
+            # target is in the right half
+            first = mid + 1
 
-    Args:
-        a_list: A sorted list of items.
-        target: The item to search for.
-
-    Returns:
-        True if target is found, False otherwise.
-    """
+    return False
     pass  # TODO: implement this
 
 
@@ -63,46 +53,38 @@ def binary_search(a_list, target):
 
 
 def sequential_search_counted(a_list, target):
-    """
-    Same as sequential_search, but also counts comparisons.
+    comparisons = 0
 
-    A "comparison" is each time you check whether a list element
-    equals the target.
+    for item in a_list:
+        comparisons += 1  # compare item to target
+        if item == target:
+            return True, comparisons
 
-    Args:
-        a_list: A list of items (not necessarily sorted).
-        target: The item to search for.
-
-    Returns:
-        A tuple (found, comparisons) where:
-            found: True if target is in the list, False otherwise.
-            comparisons: The number of element-to-target comparisons made.
-
-    Example:
-        sequential_search_counted([4, 8, 2, 15, 17], 17)  → (True, 5)
-        sequential_search_counted([4, 8, 2, 15, 17], 99)  → (False, 5)
-    """
+    # not found
+    return False, comparisons
+   
     pass  # TODO: implement this
 
 
 def binary_search_counted(a_list, target):
-    """
-    Same as binary_search, but also counts comparisons.
+    first = 0
+    last = len(a_list) - 1
+    comparisons = 0
 
-    A "comparison" is each time you check a_list[mid] against the target.
-    Count one comparison per loop iteration (the mid check).
+    while first <= last:
+        mid = (first + last) // 2
+        mid_value = a_list[mid]
 
-    Args:
-        a_list: A sorted list of items.
-        target: The item to search for.
+        # We are comparing this mid element to the target
+        comparisons += 1
 
-    Returns:
-        A tuple (found, comparisons) where:
-            found: True if target is in the list, False otherwise.
-            comparisons: The number of midpoint-to-target comparisons made.
+        if mid_value == target:
+            return True, comparisons
+        elif target < mid_value:
+            last = mid - 1
+        else:
+            first = mid + 1
 
-    Example:
-        binary_search_counted([2, 4, 8, 15, 17], 17)  → (True, 3)
-        binary_search_counted([2, 4, 8, 15, 17], 99)  → (False, 3)
-    """
+    return False, comparisons
+    
     pass  # TODO: implement this
